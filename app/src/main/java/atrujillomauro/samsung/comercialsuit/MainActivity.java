@@ -8,6 +8,7 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -73,6 +74,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                             .setTabListener(this)
             );
         }
+    }
+
+    public void clicki(View v) {
+        Log.i("INFO", "BOTON CLICKEADO");
     }
 
 
@@ -157,7 +162,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            if (position == 0)
+                return PlaceholderFragment.newInstance(position + 1);
+            else
+                return BlankFragment.newInstance(position + 1);
         }
 
         @Override
