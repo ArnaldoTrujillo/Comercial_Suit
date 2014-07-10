@@ -6,6 +6,8 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,6 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 import java.util.Locale;
 
@@ -37,6 +42,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
      */
     ViewPager mViewPager;
     Button addClient;
+    SimpleCursorAdapter cursorAdapter;
+    ListView listClientes;
+    private String[] from = {DBAdapter.Columns._ID, DBAdapter.Columns.NOMBRE_COL, DBAdapter.Columns.TLF_COL, DBAdapter.Columns.FECHA_COL, DBAdapter.Columns.COMISION_COL};
+    private int[] to = {0, R.id.listName, R.id.listTelf, R.id.listFecha, R.id.listComision};
+    private int paginaActual = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +72,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             @Override
             public void onPageSelected(int position) {
                 actionBar.setSelectedNavigationItem(position);
+                paginaActual = position;
             }
         });
 
@@ -78,6 +89,14 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             );
         }
 
+        //TODO hay error aqui
+        DBAdapter dbAdapter = new DBAdapter(this);
+        DBAdapter.DBHelper dbHelper = dbAdapter.getDbHelper();
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+        Cursor cursor = database.query(DBAdapter.TB_REGISTRO, from, null, null, null, null, DBAdapter.Columns.FECHA_COL + " DESC");
+        cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_layout, cursor, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+        listClientes = (ListView) mSectionsPagerAdapter.getItem(paginaActual).getActivity().findViewById(R.id.clientesList);
+        listClientes.setAdapter(cursorAdapter);
     }
 
     public void clicki(View v) {
