@@ -12,7 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
-        android:inputType="textPersonName"
         android:text="Nombre:"
         android:textSize="20sp" />
 
@@ -20,7 +19,8 @@
         android:id="@+id/nombreET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/nombreTV" />
+        android:layout_toRightOf="@id/nombreTV"
+        android:inputType="textPersonName" />
 
     <TextView
         android:id="@+id/apellidoTV"
@@ -37,8 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/nombreET"
         android:layout_margin="15dp"
-        android:layout_toRightOf="@id/apellidoTV"
-        android:inputType="textPostalAddress" />
+        android:layout_toRightOf="@id/apellidoTV" />
 
     <TextView
         android:id="@+id/direccionTV"
@@ -56,7 +55,8 @@
         android:layout_below="@id/apellidoET"
         android:layout_margin="8dp"
         android:layout_toRightOf="@id/direccionTV"
-        android:inputType="number" />
+
+        android:inputType="textPostalAddress" />
 
     <LinearLayout
         android:id="@+id/cpLL"
@@ -79,7 +79,8 @@
             android:id="@+id/cpET"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="8" />
+            android:layout_weight="8"
+            android:inputType="number" />
 
         <ImageButton
             android:layout_width="0dp"
@@ -150,8 +151,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-
         android:background="@drawable/redondeado"
+
+        android:onClick="agregarClientes"
         android:text="Aceptar" />
 
 
