@@ -10,13 +10,13 @@ public class DBAdapter {
     private final static int DB_VERSION = 1;
     private final static String DB_NAME = "registroDB";
     private final static String TB_REGISTRO = "clientesTable";
-    private final static String CR_TABLE = "CREATE TABLE IF NOT EXISTS "
+    private final static String CR_TABLE = "CREATE TABLE "
             + TB_REGISTRO + " (" + Columns.ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT, " + Columns.NOMBRE_COL
             + " TEXT, " + Columns.APELLIDOS_COL + " TEXT NOT NULL, " + Columns.DIRECCION_COL
             + " TEXT NOT NULL, " + Columns.CP_COL + " INTEGER NOT NULL, " + Columns.COMISION_COL
             + " INTENGER NOT NULL DEFAULT '0', " + Columns.TLF_COL + " INTEGER NOT NULL, "
-            + Columns.FECHA_COL + " DATETIME DEFAULT CURRENT_TIMESTAMP)";
+            + Columns.FECHA_COL + " DATE DEFAULT CURRENT_TIMESTAMP)";
 
     private final static String[] COLUMNS = {Columns.ID, Columns.NOMBRE_COL, Columns.APELLIDOS_COL, Columns.DIRECCION_COL,
             Columns.CP_COL, Columns.COMISION_COL, Columns.TLF_COL, Columns.FECHA_COL};

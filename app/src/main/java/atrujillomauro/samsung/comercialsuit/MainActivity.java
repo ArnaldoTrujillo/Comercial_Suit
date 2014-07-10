@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.Locale;
 
@@ -34,6 +36,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+    Button addClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,10 +77,13 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
                             .setTabListener(this)
             );
         }
+
     }
 
     public void clicki(View v) {
         Log.i("INFO", "BOTON CLICKEADO");
+        Intent intent = new Intent(MainActivity.this, AddClienteActivity.class);
+        startActivity(intent);
     }
 
 

@@ -4,13 +4,30 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+
+import java.util.Calendar;
 
 public class AddClienteActivity extends Activity {
+
+    Spinner comisionSpinner;
+    private String fecha;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_cliente);
+        setContentView(R.layout.add_layout);
+        comisionSpinner = (Spinner) findViewById(R.id.comisionSpinner);
+        ArrayAdapter<CharSequence> comisionAdapter = ArrayAdapter.createFromResource(this, R.array.comisiones_array, android.R.layout.simple_spinner_dropdown_item);
+        comisionSpinner.setAdapter(comisionAdapter);
+
+        //inicializando fecha
+        Calendar calendar = Calendar.getInstance();
+        fecha = calendar.get(Calendar.YEAR) + "/" + calendar.get(Calendar.MONTH) + "/" + calendar.get(Calendar.DAY_OF_MONTH);
+
     }
 
 
@@ -31,5 +48,14 @@ public class AddClienteActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void escogerFecha(View view) {
+        DataPickerFragment fechaPickFragment = new DataPickerFragment();
+        fechaPickFragment.show(getFragmentManager(), "dataPicker");
+    }
+
+    protected void setFecha(String fecha) {
+        this.fecha = fecha;
     }
 }
