@@ -1,8 +1,10 @@
 package atrujillomauro.samsung.comercialsuit;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +14,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.w3c.dom.Document;
+
 import java.util.Calendar;
 
 public class AddClienteActivity extends Activity {
@@ -19,6 +23,7 @@ public class AddClienteActivity extends Activity {
     Spinner comisionSpinner;
     EditText mNombreET, mApellidosET, mDireccionET, mCodigoPostalET, mTelefonoET;
     private String fecha;
+    private ProgressDialog dialogCP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,5 +107,39 @@ public class AddClienteActivity extends Activity {
 
     private boolean todoEstaLleno() {
         return !(mNombreET.length() != 0 && mApellidosET.length() != 0 && mDireccionET.length() != 0 && mCodigoPostalET.length() != 0 && mTelefonoET.length() != 0);
+    }
+
+    public void searchCP(View view) {
+        SearchCPTask cpTask = new SearchCPTask();
+        cpTask.execute(UtilsCP.getCpDocument());
+    }
+
+
+    public class SearchCPTask extends AsyncTask<Document, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialogCP = new ProgressDialog(AddClienteActivity.this);
+            dialogCP.setIndeterminate(true);
+            dialogCP.setMessage("Loading CP, wait a moment please");
+            dialogCP.show();
+        }
+
+        @Override
+        protected String doInBackground(Document... params) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String string) {
+            super.onPostExecute(string);
+            dialogCP.dismiss();
+        }
     }
 }
