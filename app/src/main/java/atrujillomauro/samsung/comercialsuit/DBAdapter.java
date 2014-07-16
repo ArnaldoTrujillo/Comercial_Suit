@@ -41,6 +41,7 @@ public class DBAdapter {
         public final static String FECHA_COL = "fechaLlamada";
     }
 
+
     public class DBHelper extends SQLiteOpenHelper {
         public DBHelper(Context context) {
             super(context, DB_NAME, null, DB_VERSION);

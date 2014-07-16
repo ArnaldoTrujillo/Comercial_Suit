@@ -125,7 +125,7 @@ public class AddClienteActivity extends Activity {
     public void searchCP(View view) {
         SearchCPTask cpTask = new SearchCPTask();
         downLatch = new CountDownLatch(1);
-        cpTask.execute(Pair.create(UtilsCP.getProvinciaDefault(), UtilsCP.getCpDocument()));
+        cpTask.execute(Pair.create(Utils.getProvinciaDefault(), Utils.getCpDocument()));
     }
 
 

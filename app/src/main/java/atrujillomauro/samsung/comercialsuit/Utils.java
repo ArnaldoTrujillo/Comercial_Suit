@@ -12,7 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 
-public class UtilsCP {
+public class Utils {
     private static Document cpDocument;
     private static String provinciaDefault = "Madrid";
 
@@ -28,12 +28,6 @@ public class UtilsCP {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-
-    public static String getCP(String calle, String municipio) {
-
-        return calle;
     }
 
     public static Document getCpDocument() {

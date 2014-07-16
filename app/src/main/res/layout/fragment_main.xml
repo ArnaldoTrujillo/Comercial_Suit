@@ -20,7 +20,7 @@
         android:clickable="true"
         android:drawablePadding="8dp"
         android:drawableTop="@android:drawable/ic_menu_add"
-        android:onClick="clicki"
+        android:onClick="añadirNuevoCliente"
         android:padding="8dp"
         android:text="Añadir Cliente"
         android:textColor="#FFF"

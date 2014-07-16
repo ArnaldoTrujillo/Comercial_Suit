@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 public class BlankFragment extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+    private Button calcularGananciasButton;
+
 
     public BlankFragment() {
     }
@@ -28,8 +31,20 @@ public class BlankFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_blank, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_herramientas, container, false);
+        calcularGananciasButton = (Button) rootView.findViewById(R.id.calcularGanancias);
+        calcularGananciasButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarGanancias();
+            }
+        });
         return rootView;
+    }
+
+    public void mostrarGanancias() {
+        GananciasDialogFragment dialogFragment = new GananciasDialogFragment();
+        dialogFragment.show(getFragmentManager(), "GananciasDialog");
     }
 
 }

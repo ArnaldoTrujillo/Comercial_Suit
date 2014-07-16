@@ -5,12 +5,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -20,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -31,6 +27,8 @@ import java.util.Locale;
 
 public class MainActivity extends Activity implements ActionBar.TabListener {
 
+    static SimpleCursorAdapter cursorAdapter;
+    static ListView listClientes;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -40,14 +38,10 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
      * {@link android.support.v13.app.FragmentStatePagerAdapter}.
      */
     SectionsPagerAdapter mSectionsPagerAdapter;
-
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
-    Button addClient;
-    static SimpleCursorAdapter cursorAdapter;
-    static ListView listClientes;
     private String[] from = {DBAdapter.Columns._ID, DBAdapter.Columns.NOMBRE_COL, DBAdapter.Columns.TLF_COL, DBAdapter.Columns.FECHA_COL, DBAdapter.Columns.COMISION_COL};
     private int[] to = {0, R.id.listName, R.id.listTelf, R.id.listFecha, R.id.listComision};
     private int paginaActual = 0;
@@ -60,7 +54,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         Thread inicializarDOM = new Thread(new Runnable() {
             @Override
             public void run() {
-                UtilsCP.loadDOM(getApplicationContext());
+                Utils.loadDOM(getApplicationContext());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -107,21 +101,31 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             );
         }
 
-        //TODO hay error aqui
         if (cursorAdapter == null) {
-            DBAdapter dbAdapter = new DBAdapter(this);
-            DBAdapter.DBHelper dbHelper = dbAdapter.getDbHelper();
-            SQLiteDatabase database = dbHelper.getReadableDatabase();
-            Cursor cursor = database.query(DBAdapter.TB_REGISTRO, from, null, null, null, null, DBAdapter.Columns.FECHA_COL + " DESC");
-            cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_layout, cursor, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+            obtainCursorAdapter();
         }
         //listClientes.setAdapter(cursorAdapter);
     }
 
-    public void clicki(View v) {
+    public void añadirNuevoCliente(View v) {
         Log.i("INFO", "BOTON CLICKEADO");
         Intent intent = new Intent(MainActivity.this, AddClienteActivity.class);
         startActivity(intent);
+    }
+
+    public void mostrarGanancias() {
+        GananciasDialogFragment dialogFragment = new GananciasDialogFragment();
+        dialogFragment.show(getFragmentManager(), "GananciasDialog");
+    }
+
+
+    public void obtainCursorAdapter() {
+
+        DBAdapter dbAdapter = new DBAdapter(this);
+        DBAdapter.DBHelper dbHelper = dbAdapter.getDbHelper();
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+        Cursor cursor = database.query(DBAdapter.TB_REGISTRO, from, null, null, null, null, DBAdapter.Columns.FECHA_COL + " DESC");
+        cursorAdapter = new SimpleCursorAdapter(this, R.layout.list_layout, cursor, from, to, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
     }
 
 
@@ -169,6 +173,7 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private static SimpleCursorAdapter myCursorAdapter;
 
         public PlaceholderFragment() {
         }
@@ -177,11 +182,12 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
+        public static PlaceholderFragment newInstance(int sectionNumber, SimpleCursorAdapter myCursorAdapter) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+            PlaceholderFragment.myCursorAdapter = myCursorAdapter;
             return fragment;
         }
 
@@ -191,15 +197,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             if (listClientes == null) {
                 listClientes = (ListView) rootView.findViewById(R.id.clientesList);
-                listClientes.setAdapter(cursorAdapter);
+                listClientes.setAdapter(myCursorAdapter);
+            } else {
+                listClientes.setAdapter(myCursorAdapter);
             }
             return rootView;
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-
         }
     }
 
@@ -217,16 +219,20 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if (position == 0)
-                return PlaceholderFragment.newInstance(position + 1);
-            else
-                return BlankFragment.newInstance(position + 1);
+            if (position == 0) {
+                obtainCursorAdapter();
+                return PlaceholderFragment.newInstance(position + 1, cursorAdapter);
+            } else {/*
+                MapFragment mapa=MapFragment.newInstance();
+                return mapa;*/
+                BlankFragment fragment = BlankFragment.newInstance(position + 1);
+                return fragment;
+            }
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
@@ -234,25 +240,11 @@ public class MainActivity extends Activity implements ActionBar.TabListener {
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
+                    return "Clientes";
                 case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                    return "Herramientas";
             }
             return null;
         }
     }
-
-    public class MiCursorLoader extends CursorLoader {
-
-        public MiCursorLoader(Context context) {
-            super(context);
-        }
-
-        public MiCursorLoader(Context context, Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-            super(context, uri, projection, selection, selectionArgs, sortOrder);
-        }
-    }
-
 }
