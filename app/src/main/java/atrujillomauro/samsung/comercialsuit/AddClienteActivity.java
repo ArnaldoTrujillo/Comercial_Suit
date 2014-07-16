@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,15 +16,23 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.util.Calendar;
+import java.util.concurrent.CountDownLatch;
 
 public class AddClienteActivity extends Activity {
 
+    public static volatile CountDownLatch downLatch;
     Spinner comisionSpinner;
     EditText mNombreET, mApellidosET, mDireccionET, mCodigoPostalET, mTelefonoET;
     private String fecha;
+    private String localidad;
+    private String calleMayuscula;
     private ProgressDialog dialogCP;
+    private DialogoLocalidad dialogoLocalidad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +86,10 @@ public class AddClienteActivity extends Activity {
         this.fecha = fecha;
     }
 
+    public void setLocalidad(String localidad) {
+        this.localidad = localidad;
+    }
+
     public void agregarClientes(View view) {
         if (todoEstaLleno()) {
             Toast.makeText(this, "Debe rellenar todos los campos", Toast.LENGTH_LONG).show();
@@ -111,35 +124,76 @@ public class AddClienteActivity extends Activity {
 
     public void searchCP(View view) {
         SearchCPTask cpTask = new SearchCPTask();
-        cpTask.execute(UtilsCP.getCpDocument());
+        downLatch = new CountDownLatch(1);
+        cpTask.execute(Pair.create(UtilsCP.getProvinciaDefault(), UtilsCP.getCpDocument()));
     }
 
 
-    public class SearchCPTask extends AsyncTask<Document, Void, String> {
+    public class SearchCPTask extends AsyncTask<Pair<String, Document>, Void, String> {
+        private String nombreCalle;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialogCP = new ProgressDialog(AddClienteActivity.this);
-            dialogCP.setIndeterminate(true);
-            dialogCP.setMessage("Loading CP, wait a moment please");
-            dialogCP.show();
+            nombreCalle = mDireccionET.getText().toString().toUpperCase();
+            if (nombreCalle.contains(" "))
+                nombreCalle = nombreCalle.substring(0, nombreCalle.indexOf(" "));
+            new DialogoLocalidad().show(getFragmentManager(), "DialogoLocalidad");
         }
 
         @Override
-        protected String doInBackground(Document... params) {
+        protected String doInBackground(Pair<String, Document>... params) {
             try {
-                Thread.sleep(5000);
+                downLatch.await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return "";
+            String provincia = params[0].first;
+            Document mainDocument = params[0].second;
+            Element spainElement = mainDocument.getDocumentElement();
+            NodeList provincias = spainElement.getElementsByTagName("provincia");
+            Element madridNode = null;
+            for (int i = 0; i < provincias.getLength(); i++) {
+                Element actual = (Element) provincias.item(i);
+                if (actual.getAttribute("nombre").equals("Madrid")) {
+                    madridNode = actual;
+                    break;
+                }
+            }
+            NodeList codigosPostales = madridNode.getElementsByTagName("codigo-postal");
+            for (int i = 0; i < codigosPostales.getLength(); i++) {
+                Node actual = codigosPostales.item(i);
+                NodeList municipioAndCalles = actual.getChildNodes();
+                Element posibleMunicipio = (Element) municipioAndCalles.item(1);
+                //aqui busco la calle especifica
+                if (posibleMunicipio.getAttribute("nombre").equals(localidad)) {
+                    for (int j = 3; j < municipioAndCalles.getLength(); j += 2) {
+                        Element calleActual = (Element) municipioAndCalles.item(j);
+                        String nombreCalleActual = calleActual.getAttribute("nombre");
+                        if (nombreCalleActual.contains(nombreCalle)) {
+                            return ((Element) actual).getAttribute("value");
+                        }
+                    }
+                }
+            }
+            return "00000";
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            Toast.makeText(AddClienteActivity.this, "Tarea Cancelada", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         protected void onPostExecute(String string) {
             super.onPostExecute(string);
-            dialogCP.dismiss();
+            if (string.equals("00000"))
+                Toast.makeText(getApplicationContext(), "No se encontró el CP de esa calle en la Base de Datos", Toast.LENGTH_SHORT).show();
+            else {
+                mCodigoPostalET.setText(string);
+            }
         }
     }
+
 }

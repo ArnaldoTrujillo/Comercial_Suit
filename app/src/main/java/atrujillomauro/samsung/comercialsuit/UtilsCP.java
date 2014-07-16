@@ -14,12 +14,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class UtilsCP {
     private static Document cpDocument;
+    private static String provinciaDefault = "Madrid";
 
     public static void loadDOM(Context context) {
         try {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
-            cpDocument = builder.parse(context.getResources().openRawResource(R.raw.bbdd));
+            cpDocument = builder.parse(context.getResources().openRawResource(R.raw.bbdd_madrid));
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -37,5 +38,9 @@ public class UtilsCP {
 
     public static Document getCpDocument() {
         return cpDocument;
+    }
+
+    public static String getProvinciaDefault() {
+        return provinciaDefault;
     }
 }
