@@ -123,13 +123,13 @@ public class AddClienteActivity extends Activity {
     }
 
     public void searchCP(View view) {
-        SearchCPTask cpTask = new SearchCPTask();
+        SearchCPTaskDOM cpTask = new SearchCPTaskDOM();
         downLatch = new CountDownLatch(1);
         cpTask.execute(Pair.create(Utils.getProvinciaDefault(), Utils.getCpDocument()));
     }
 
 
-    public class SearchCPTask extends AsyncTask<Pair<String, Document>, Void, String> {
+    public class SearchCPTaskDOM extends AsyncTask<Pair<String, Document>, Void, String> {
         private String nombreCalle;
 
         @Override
@@ -195,5 +195,6 @@ public class AddClienteActivity extends Activity {
             }
         }
     }
+
 
 }
